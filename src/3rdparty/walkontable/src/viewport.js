@@ -47,6 +47,7 @@ class Viewport {
     let height = 0;
 
     if (trimmingContainer === window) {
+      // 适配低端手机 @yangguang23
       height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 
     } else {

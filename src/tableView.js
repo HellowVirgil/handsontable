@@ -106,6 +106,9 @@ function TableView(instance) {
     if (instance.selection.isInProgress()) {
       instance.selection.finish();
     }
+
+    // 移动端编辑单元格后点出表格不触发 mousedown，这里重置一下 @yangguang23
+    isMouseDown = false;
   });
 
   this.eventManager.addEventListener(document.documentElement, 'mousedown', (event) => {

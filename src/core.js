@@ -754,19 +754,25 @@ export default function Core(rootElement, userSettings, rootInstanceSymbol = fal
                 }
               }
               if (value !== null && typeof value === 'object') {
-                if (orgValue === null || typeof orgValue !== 'object') {
+                // 删除 schema 的校验及 orgValue === null 的判定 @yangguang23
+                // if (orgValue === null || typeof orgValue !== 'object') {
+                //   pushData = false;
+
+                // } else {
+                //   let orgValueSchema = duckSchema(orgValue[0] || orgValue);
+                //   let valueSchema = duckSchema(value[0] || value);
+
+                //   /* eslint-disable max-depth */
+                //   if (isObjectEqual(orgValueSchema, valueSchema)) {
+                //     value = deepClone(value);
+                //   } else {
+                //     pushData = false;
+                //   }
+                // }
+                if (typeof orgValue !== 'object') {
                   pushData = false;
-
                 } else {
-                  let orgValueSchema = duckSchema(orgValue[0] || orgValue);
-                  let valueSchema = duckSchema(value[0] || value);
-
-                  /* eslint-disable max-depth */
-                  if (isObjectEqual(orgValueSchema, valueSchema)) {
-                    value = deepClone(value);
-                  } else {
-                    pushData = false;
-                  }
+                  value = deepClone(value);
                 }
 
               } else if (orgValue !== null && typeof orgValue === 'object') {

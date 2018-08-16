@@ -109,6 +109,8 @@ var onBeforeKeyDown = function onBeforeKeyDown(event) {
 
   // Process only events that have been fired in the editor
   if (event.target !== that.TEXTAREA || isImmediatePropagationStopped(event)) {
+    // 拓展 quill 后， event.target !== that.TEXTAREA，阻止事件冒泡 @yangguang23
+    stopImmediatePropagation(event);
     return;
   }
 
@@ -330,8 +332,11 @@ TextEditor.prototype.refreshDimensions = function(force = false) {
   const colHeadersCount = this.instance.hasColHeaders();
   const backgroundColor = this.TD.style.backgroundColor;
 
-  let editTop = currentOffset.top - containerOffset.top - editTopModifier - scrollTop;
-  let editLeft = currentOffset.left - containerOffset.left - 1 - scrollLeft;
+  // 原本 editorInput 是相对于 table 定位, 将 editorInput 放到 document 下后导致相对于 document 定位, 需要移除容器的定位 @yangguang23
+  // let editTop = currentOffset.top - containerOffset.top - editTopModifier - scrollTop;
+  // let editLeft = currentOffset.left - containerOffset.left - 1 - scrollLeft;
+  let editTop = currentOffset.top - editTopModifier - scrollTop;
+  let editLeft = currentOffset.left - 1 - scrollLeft;
   let cssTransformOffset;
 
   // TODO: Refactor this to the new instance.getCell method (from #ply-59), after 0.12.1 is released
@@ -383,10 +388,14 @@ TextEditor.prototype.refreshDimensions = function(force = false) {
   let cellTopOffset = this.TD.offsetTop + firstRowOffset - verticalScrollPosition;
   let cellLeftOffset = this.TD.offsetLeft + firstColumnOffset - horizontalScrollPosition;
 
-  let width = innerWidth(this.TD) - 8;
+  // 修改 width 计算 @yangguang23
+  // let width = innerWidth(this.TD) - 8;
+  let width = innerWidth(this.TD);
   let actualVerticalScrollbarWidth = hasVerticalScrollbar(scrollableContainer) ? scrollbarWidth : 0;
   let actualHorizontalScrollbarWidth = hasHorizontalScrollbar(scrollableContainer) ? scrollbarWidth : 0;
-  let maxWidth = this.instance.view.maximumVisibleElementWidth(cellLeftOffset) - 9 - actualVerticalScrollbarWidth;
+  // 修改 maxwidth 计算 @yangguang23
+  // let maxWidth = this.instance.view.maximumVisibleElementWidth(cellLeftOffset) - 9 - actualVerticalScrollbarWidth;
+  let maxWidth = this.instance.view.maximumVisibleElementWidth(cellLeftOffset) - actualVerticalScrollbarWidth;
   let height = this.TD.scrollHeight + 1;
   let maxHeight = Math.max(this.instance.view.maximumVisibleElementHeight(cellTopOffset) - actualHorizontalScrollbarWidth, 23);
 

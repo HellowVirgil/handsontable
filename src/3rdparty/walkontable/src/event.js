@@ -64,24 +64,32 @@ function Event(instance) {
     }
   };
 
-  var onTouchMove = function() {
-    that.instance.touchMoving = true;
-  };
+  // 影响移动端双击，先注释掉 @yangguang23
+  // var onTouchMove = function() {
+  //   that.instance.touchMoving = true;
+  // };
 
   var onTouchStart = function(event) {
-    eventManager.addEventListener(this, 'touchmove', onTouchMove);
+    // 影响移动端双击，先注释掉 @yangguang23
+    // eventManager.addEventListener(this, 'touchmove', onTouchMove);
 
-    // Prevent cell selection when scrolling with touch event - not the best solution performance-wise
-    that.checkIfTouchMove = setTimeout(() => {
-      if (that.instance.touchMoving === true) {
-        that.instance.touchMoving = void 0;
+    // // Prevent cell selection when scrolling with touch event - not the best solution performance-wise
+    // that.checkIfTouchMove = setTimeout(() => {
+    //   if (that.instance.touchMoving === true) {
+    //     that.instance.touchMoving = void 0;
 
-        eventManager.removeEventListener('touchmove', onTouchMove, false);
-      }
+    //     eventManager.removeEventListener('touchmove', onTouchMove, false);
+    //   }
+    //   // 防止滚动过程中 table触发 mousedown 高亮 @yanngguang23
+    //   else {
+    //     onMouseDown(event);
+    //   }
 
-      onMouseDown(event);
+    //   // onMouseDown(event);
 
-    }, 30);
+    // }, 30);
+
+    onMouseDown(event);
   };
 
   var onMouseOver = function(event) {

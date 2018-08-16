@@ -24,7 +24,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  * Version: 5.0.0
- * Release date: 11/07/2018 (built at 05/07/2018 08:24:58)
+ * Release date: 11/07/2018 (built at 15/08/2018 17:01:13)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -12948,6 +12948,8 @@ var onBeforeKeyDown = function onBeforeKeyDown(event) {
 
   // Process only events that have been fired in the editor
   if (event.target !== that.TEXTAREA || (0, _event.isImmediatePropagationStopped)(event)) {
+    // 拓展 quill 后， event.target !== that.TEXTAREA，阻止事件冒泡 @yangguang23
+    (0, _event.stopImmediatePropagation)(event);
     return;
   }
 
@@ -13167,8 +13169,11 @@ TextEditor.prototype.refreshDimensions = function () {
   var colHeadersCount = this.instance.hasColHeaders();
   var backgroundColor = this.TD.style.backgroundColor;
 
-  var editTop = currentOffset.top - containerOffset.top - editTopModifier - scrollTop;
-  var editLeft = currentOffset.left - containerOffset.left - 1 - scrollLeft;
+  // 原本 editorInput 是相对于 table 定位, 将 editorInput 放到 document 下后导致相对于 document 定位, 需要移除容器的定位 @yangguang23
+  // let editTop = currentOffset.top - containerOffset.top - editTopModifier - scrollTop;
+  // let editLeft = currentOffset.left - containerOffset.left - 1 - scrollLeft;
+  var editTop = currentOffset.top - editTopModifier - scrollTop;
+  var editLeft = currentOffset.left - 1 - scrollLeft;
   var cssTransformOffset = void 0;
 
   // TODO: Refactor this to the new instance.getCell method (from #ply-59), after 0.12.1 is released
@@ -13219,10 +13224,14 @@ TextEditor.prototype.refreshDimensions = function () {
   var cellTopOffset = this.TD.offsetTop + firstRowOffset - verticalScrollPosition;
   var cellLeftOffset = this.TD.offsetLeft + firstColumnOffset - horizontalScrollPosition;
 
-  var width = (0, _element.innerWidth)(this.TD) - 8;
+  // 修改 width 计算 @yangguang23
+  // let width = innerWidth(this.TD) - 8;
+  var width = (0, _element.innerWidth)(this.TD);
   var actualVerticalScrollbarWidth = (0, _element.hasVerticalScrollbar)(scrollableContainer) ? scrollbarWidth : 0;
   var actualHorizontalScrollbarWidth = (0, _element.hasHorizontalScrollbar)(scrollableContainer) ? scrollbarWidth : 0;
-  var maxWidth = this.instance.view.maximumVisibleElementWidth(cellLeftOffset) - 9 - actualVerticalScrollbarWidth;
+  // 修改 maxwidth 计算 @yangguang23
+  // let maxWidth = this.instance.view.maximumVisibleElementWidth(cellLeftOffset) - 9 - actualVerticalScrollbarWidth;
+  var maxWidth = this.instance.view.maximumVisibleElementWidth(cellLeftOffset) - actualVerticalScrollbarWidth;
   var height = this.TD.scrollHeight + 1;
   var maxHeight = Math.max(this.instance.view.maximumVisibleElementHeight(cellTopOffset) - actualHorizontalScrollbarWidth, 23);
 
@@ -16069,18 +16078,25 @@ function Core(rootElement, userSettings) {
                 }
               }
               if (value !== null && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
-                if (orgValue === null || (typeof orgValue === 'undefined' ? 'undefined' : _typeof(orgValue)) !== 'object') {
+                // 删除 schema 的校验及 orgValue === null 的判定 @yangguang23
+                // if (orgValue === null || typeof orgValue !== 'object') {
+                //   pushData = false;
+
+                // } else {
+                //   let orgValueSchema = duckSchema(orgValue[0] || orgValue);
+                //   let valueSchema = duckSchema(value[0] || value);
+
+                //   /* eslint-disable max-depth */
+                //   if (isObjectEqual(orgValueSchema, valueSchema)) {
+                //     value = deepClone(value);
+                //   } else {
+                //     pushData = false;
+                //   }
+                // }
+                if ((typeof orgValue === 'undefined' ? 'undefined' : _typeof(orgValue)) !== 'object') {
                   pushData = false;
                 } else {
-                  var orgValueSchema = (0, _object.duckSchema)(orgValue[0] || orgValue);
-                  var valueSchema = (0, _object.duckSchema)(value[0] || value);
-
-                  /* eslint-disable max-depth */
-                  if ((0, _object.isObjectEqual)(orgValueSchema, valueSchema)) {
-                    value = (0, _object.deepClone)(value);
-                  } else {
-                    pushData = false;
-                  }
+                  value = (0, _object.deepClone)(value);
                 }
               } else if (orgValue !== null && (typeof orgValue === 'undefined' ? 'undefined' : _typeof(orgValue)) === 'object') {
                 pushData = false;
@@ -24698,23 +24714,32 @@ function Event(instance) {
     }
   };
 
-  var onTouchMove = function onTouchMove() {
-    that.instance.touchMoving = true;
-  };
+  // 影响移动端双击，先注释掉 @yangguang23
+  // var onTouchMove = function() {
+  //   that.instance.touchMoving = true;
+  // };
 
   var onTouchStart = function onTouchStart(event) {
-    eventManager.addEventListener(this, 'touchmove', onTouchMove);
+    // 影响移动端双击，先注释掉 @yangguang23
+    // eventManager.addEventListener(this, 'touchmove', onTouchMove);
 
-    // Prevent cell selection when scrolling with touch event - not the best solution performance-wise
-    that.checkIfTouchMove = setTimeout(function () {
-      if (that.instance.touchMoving === true) {
-        that.instance.touchMoving = void 0;
+    // // Prevent cell selection when scrolling with touch event - not the best solution performance-wise
+    // that.checkIfTouchMove = setTimeout(() => {
+    //   if (that.instance.touchMoving === true) {
+    //     that.instance.touchMoving = void 0;
 
-        eventManager.removeEventListener('touchmove', onTouchMove, false);
-      }
+    //     eventManager.removeEventListener('touchmove', onTouchMove, false);
+    //   }
+    //   // 防止滚动过程中 table触发 mousedown 高亮 @yanngguang23
+    //   else {
+    //     onMouseDown(event);
+    //   }
 
-      onMouseDown(event);
-    }, 30);
+    //   // onMouseDown(event);
+
+    // }, 30);
+
+    onMouseDown(event);
   };
 
   var onMouseOver = function onMouseOver(event) {
@@ -27092,6 +27117,7 @@ var TableRenderer = function () {
           performanceWarningAppeared = true;
           (0, _console.warn)((0, _templateLiteralTag.toSingleLine)(_templateObject));
         }
+
         if (rowsToRender !== void 0 && visibleRowIndex === rowsToRender) {
           // We have as much rows as needed for this clone
           break;
@@ -27703,7 +27729,8 @@ var Viewport = function () {
       var height = 0;
 
       if (trimmingContainer === window) {
-        height = document.documentElement.clientHeight;
+        // 适配低端手机 @yangguang23
+        height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
       } else {
         elemHeight = (0, _element.outerHeight)(trimmingContainer);
         // returns height without DIV scrollbar
@@ -35155,7 +35182,7 @@ Handsontable.DefaultSettings = _defaultSettings2.default;
 Handsontable.EventManager = _eventManager2.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = '05/07/2018 08:24:58';
+Handsontable.buildDate = '15/08/2018 17:01:13';
 Handsontable.packageName = 'handsontable';
 Handsontable.version = '5.0.0';
 
@@ -42402,6 +42429,9 @@ function TableView(instance) {
     if (instance.selection.isInProgress()) {
       instance.selection.finish();
     }
+
+    // 移动端编辑单元格后点出表格不触发 mousedown，这里重置一下 @yangguang23
+    isMouseDown = false;
   });
 
   this.eventManager.addEventListener(document.documentElement, 'mousedown', function (event) {
