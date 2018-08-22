@@ -24,7 +24,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  * Version: 5.0.0
- * Release date: 11/07/2018 (built at 15/08/2018 17:01:13)
+ * Release date: 11/07/2018 (built at 22/08/2018 13:42:05)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -20285,7 +20285,8 @@ var Overlays = function () {
       var hiderStyle = this.wot.wtTable.hider.style;
 
       hiderStyle.width = headerRowSize + this.leftOverlay.sumCellSizes(0, totalColumns) + 'px';
-      hiderStyle.height = headerColumnSize + this.topOverlay.sumCellSizes(0, totalRows) + 1 + 'px';
+      // hider 内有图片是异步加载的，这里取消赋值@yangguang23
+      // hiderStyle.height = `${headerColumnSize + this.topOverlay.sumCellSizes(0, totalRows) + 1}px`;
 
       this.topOverlay.adjustElementsSize(force);
       this.leftOverlay.adjustElementsSize(force);
@@ -29918,7 +29919,7 @@ Handsontable.DefaultSettings = _defaultSettings2.default;
 Handsontable.EventManager = _eventManager2.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = '15/08/2018 17:01:13';
+Handsontable.buildDate = '22/08/2018 13:42:05';
 Handsontable.packageName = 'handsontable';
 Handsontable.version = '5.0.0';
 

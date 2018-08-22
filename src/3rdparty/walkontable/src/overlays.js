@@ -523,7 +523,8 @@ class Overlays {
     let hiderStyle = this.wot.wtTable.hider.style;
 
     hiderStyle.width = `${headerRowSize + this.leftOverlay.sumCellSizes(0, totalColumns)}px`;
-    hiderStyle.height = `${headerColumnSize + this.topOverlay.sumCellSizes(0, totalRows) + 1}px`;
+    // hider 内有图片是异步加载的，这里取消赋值@yangguang23
+    // hiderStyle.height = `${headerColumnSize + this.topOverlay.sumCellSizes(0, totalRows) + 1}px`;
 
     this.topOverlay.adjustElementsSize(force);
     this.leftOverlay.adjustElementsSize(force);
